@@ -26,7 +26,7 @@
                         'readonly':[('state','=','posted')]}"/>
                     <field name="third_partner_id"
                         attrs="{'invisible':[('third_partner_withholding','=',False)],
-                            'required':[('third_partner_withholding','=',True)]
+                            'required':[('third_partner_withholding','=',True)],
                             'readonly':[('state','=','posted')]}"/>
                 </field>
                 <field name="selected_debt" position="replace">
