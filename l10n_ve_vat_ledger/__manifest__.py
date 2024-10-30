@@ -27,7 +27,7 @@
         'report_xlsx', 
         'l10n_ve_igtf_purchase'],
     'data': [
-        'security/security.xml',
+        # 'security/security.xml',
         'security/ir.model.access.csv',
         'views/account_vat_ledger_views.xml',
         'wizard/account_wizard_views.xml',
