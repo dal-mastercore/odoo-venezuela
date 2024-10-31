@@ -20,6 +20,14 @@
                         attrs="{'invisible': ['|',('islr', '!=', True),('withholding_distributin_islr', '!=', False)], 'required': [('islr', '!=', False),('withholding_distributin_islr', '!=', True), ('state', 'in', ['draft', 'confirmed'])]}"
                         domain="[('id', 'in', partner_regimen_islr_ids)]"
                         options='{"no_open": True, "no_create": True}'/>
+                    <field name="third_partner_withholding"
+                        widget="boolean_toggle"
+                        attrs="{'invisible':[('iva','=',False),('islr','=',False)],
+                        'readonly':[('state','=','posted')]}"/>
+                    <field name="third_partner_id"
+                        attrs="{'invisible':[('third_partner_withholding','=',False)],
+                            'required':[('third_partner_withholding','=',True)],
+                            'readonly':[('state','=','posted')]}"/>
                 </field>
                 <field name="selected_debt" position="replace">
                     <field name="debt_multicurrency" invisible="1"/>

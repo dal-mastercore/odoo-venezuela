@@ -54,6 +54,14 @@ class AccountPaymentGroup(models.Model):
         'withholding.distribution.islr', 'payment_group_id',
         string='Distribucion de conceptos')
 
+    third_partner_withholding = fields.Boolean(string='Retención a terceros',
+                                               default=False)
+    
+    third_partner_id = fields.Many2one(
+        string=_('Tercero'),
+        comodel_name='res.partner',
+    )
+
     @api.onchange('withholding_distributin_islr')
     def _onchange_withholding_distributin_islr(self):
         for rec in self:
@@ -71,7 +79,7 @@ class AccountPaymentGroup(models.Model):
             else:
                 rec.withholding_distributin_islr_ids = False
 
-    @api.depends('partner_id.seniat_regimen_islr_ids')
+    @api.depends('partner_id.seniat_regimen_islr_ids', 'third_partner_withholding', 'third_partner_id.seniat_regimen_islr_ids')
     def _partner_regimenes_islr(self):
         """
         Lo hacemos con campo computado y no related para que solo se setee
@@ -80,6 +88,8 @@ class AccountPaymentGroup(models.Model):
         for rec in self:
             if rec.partner_type == 'supplier':
                 rec.partner_regimen_islr_ids = rec.partner_id.seniat_regimen_islr_ids
+                if rec.third_partner_withholding and rec.third_partner_id and rec.partner_type == 'supplier':
+                    rec.partner_regimen_islr_ids = rec.third_partner_id.seniat_regimen_islr_ids
             else:
                 rec.partner_regimen_islr_ids = rec.env['seniat.tabla.islr']
 
