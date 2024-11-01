@@ -303,7 +303,7 @@ class AccountVatLedgerXlsx(models.AbstractModel):
             retens = []
             if obj.type == 'purchase':
                 tax_withholding_id = self.env['account.tax'].search([
-                    ('type_tax_use', '=', 'purchase'),
+                    ('type_tax_use', '=', 'supplier'),
                     ('withholding_type', '=', 'partner_tax')
                 ], limit=1)
             else:
@@ -426,8 +426,7 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                     sheet.write(row, 3, invoice.ref or '', line)
                     # Número de Control
                     sheet.write(row, 4, invoice.l10n_ve_document_number or '', line)
-                    
-                    
+
                     # Retencion
                     # Numero de comprobante
                     sheet.write(row, 5, '', line)
@@ -966,7 +965,8 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                     sheet.write(row, 25, reten.amount, line)
                     ###### IGTF
                     sheet.write(row, 26, '', line)
-                    retenciones.remove(reten)
+                    if reten in retenciones:
+                        retenciones.remove(reten)
                     row +=1
 
             elif len(retenciones) > 0 and obj.type == 'sale':
