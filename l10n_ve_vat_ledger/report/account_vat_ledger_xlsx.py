@@ -52,7 +52,6 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                     ],limit=1).rate
             if last_rate == 0:
                 last_rate = 1
-            _logger.warning(last_rate)
             base_imponible = line.price_subtotal / last_rate
         else:
             base_imponible = line.price_subtotal
@@ -63,7 +62,6 @@ class AccountVatLedgerXlsx(models.AbstractModel):
             'tax_amount':tax_amount,
             'total': total
         }
-        _logger.warning(data)
         return data
 
     def generate_xlsx_report(self, workbook, data, account_vat):
@@ -533,7 +531,8 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                                             base_exento += amounts.get('base_imponible')
                                             total_base_exento_debito += amounts.get('base_imponible')
                                     else:
-                                        total_base_exento += linel.debit if linel.credit == 0 else -linel.debit
+                                        total_base_exento += base_exento
+
                                 elif linel.tax_ids[0].amount == 8.00:
                                     amounts = self.get_amount_base_amount(linel, 8)
                                     base_imponible_8 += amounts.get('base_imponible')
