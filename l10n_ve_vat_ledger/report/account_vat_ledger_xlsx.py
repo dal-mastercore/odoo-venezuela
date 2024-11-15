@@ -908,6 +908,7 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                 row += 1
             if len(retenciones) > 1 and obj.type == 'purchase':
                     for reten in retenciones:
+                        i += 1
                         # codigo 
                         sheet.write(row, 0, i, line)
                         # fehca
@@ -971,7 +972,7 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                         ###### IGTF
                         sheet.write(row, 26, '', line)
                         retenciones.remove(reten)
-                    row +=1
+                        row +=1
 
             elif len(retenciones) > 0 and obj.type == 'sale':
                 for reten in sorted(retenciones, key=lambda x: x.date):
