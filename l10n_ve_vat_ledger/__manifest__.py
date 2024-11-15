@@ -17,7 +17,7 @@
 
     'author': "SINAPSYS GLOBAL SA || MASTERCORE SAS",
     'website': "http://sinapsys.global",
-    'version': '15.0.7',
+    'version': '16.0.1',
     'category': 'Localization',
     'license': 'AGPL-3',
     'depends': [
@@ -27,7 +27,7 @@
         'report_xlsx', 
         'l10n_ve_igtf_purchase'],
     'data': [
-        'security/security.xml',
+        # 'security/security.xml',
         'security/ir.model.access.csv',
         'views/account_vat_ledger_views.xml',
         'wizard/account_wizard_views.xml',
