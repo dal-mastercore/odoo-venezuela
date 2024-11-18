@@ -343,7 +343,7 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                     ('state', '=', 'posted'),
                     ('date', '>=', obj.date_from),
                     ('date', '<=', obj.date_to),
-                ])
+                ], order="withholding_number asc")
             retenciones = []
             if retens:
                 retenciones = list(retens)
