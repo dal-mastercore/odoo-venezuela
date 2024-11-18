@@ -41,7 +41,6 @@ class AccountVatLedgerXlsx(models.AbstractModel):
         tax_amount = 0
         total = 0
         if line.currency_id != line.move_id.company_currency_id:
-            _logger.warning(line.move_id.name)
             last_rate = self.env['res.currency.rate'].search([
                 ('currency_id', '=', line.currency_id.id),
                 ('name', '=', line.move_id.invoice_date)
@@ -344,7 +343,7 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                     ('state', '=', 'posted'),
                     ('date', '>=', obj.date_from),
                     ('date', '<=', obj.date_to),
-                ])
+                ], order="withholding_number asc")
             retenciones = []
             if retens:
                 retenciones = list(retens)
@@ -907,72 +906,74 @@ class AccountVatLedgerXlsx(models.AbstractModel):
                         sheet.write(row, 29, igtf_amount if igtf_amount > 0 else '' , line)
                 row += 1
             if len(retenciones) > 1 and obj.type == 'purchase':
-                    for reten in retenciones:
-                        i += 1
-                        # codigo 
-                        sheet.write(row, 0, i, line)
-                        # fehca
-                        sheet.write(row, 1, reten.date, date_line)
-                        # tipo de documento
-                        sheet.write(row, 2, 'Retención', line)
-                        sheet.write(row, 3, '', line)
-                        sheet.write(row, 4, '', line)
-                        # Numero de comrpobante
-                        sheet.write(row, 5, reten.withholding_number, line)
-                        # Documento afectado
-                        sheet.write(row, 6, reten.reconciled_bill_ids.ref, line)
-                        sheet.write(row, 7, '', line)
-                        sheet.write(row, 8, '', line)
-                        # Nombre
-                        sheet.write(row, 9, reten.move_id.partner_id.name, line)
-                        # RIF
-                        sheet.write(row, 10, '%s-%s' % (reten.move_id.partner_id. \
-                            l10n_latam_identification_type_id.l10n_ve_code or 'FALSE',
-                            reten.move_id.partner_id.vat or 'FALSE'), line)
-                        #Total
-                        sheet.write(row, 11, '', line)
-                        # Compras Exento
-                        sheet.write(row, 12, '', line)
+                for reten in retenciones:
+                    total_iva_16_retenido += reten.amount
+                    _logger.warning(reten.withholding_number)
+                    i += 1
+                    # codigo 
+                    sheet.write(row, 0, i, line)
+                    # fehca
+                    sheet.write(row, 1, reten.date, date_line)
+                    # tipo de documento
+                    sheet.write(row, 2, 'Retención', line)
+                    sheet.write(row, 3, '', line)
+                    sheet.write(row, 4, '', line)
+                    # Numero de comrpobante
+                    sheet.write(row, 5, reten.withholding_number, line)
+                    # Documento afectado
+                    sheet.write(row, 6, reten.reconciled_bill_ids.ref, line)
+                    sheet.write(row, 7, '', line)
+                    sheet.write(row, 8, '', line)
+                    # Nombre
+                    sheet.write(row, 9, reten.move_id.partner_id.name, line)
+                    # RIF
+                    sheet.write(row, 10, '%s-%s' % (reten.move_id.partner_id. \
+                        l10n_latam_identification_type_id.l10n_ve_code or 'FALSE',
+                        reten.move_id.partner_id.vat or 'FALSE'), line)
+                    #Total
+                    sheet.write(row, 11, '', line)
+                    # Compras Exento
+                    sheet.write(row, 12, '', line)
 
-                        #IMPORTACIONES
-                        # Base Imponible
-                        sheet.write(row, 13, '', line)
-                        # % Alic
-                        sheet.write(row, 14, '', line)
-                        #Imp. IVA
-                        sheet.write(row, 15, '', line)
+                    #IMPORTACIONES
+                    # Base Imponible
+                    sheet.write(row, 13, '', line)
+                    # % Alic
+                    sheet.write(row, 14, '', line)
+                    #Imp. IVA
+                    sheet.write(row, 15, '', line)
 
-                        #Compras internas
-                        # Base Imponible
-                        sheet.write(row, 16, '', line)
-                        # % Alic
-                        sheet.write(row, 17, '', line)
-                        #Imp. IVA
-                        sheet.write(row, 18, '', line)
+                    #Compras internas
+                    # Base Imponible
+                    sheet.write(row, 16, '', line)
+                    # % Alic
+                    sheet.write(row, 17, '', line)
+                    #Imp. IVA
+                    sheet.write(row, 18, '', line)
 
-                        #IVA 8%
-                        # Base Imponible
-                        sheet.write(row, 19, '', line)
-                        # % Alic
-                        sheet.write(row, 20, '', line)
-                        #Imp. IVA
-                        sheet.write(row, 21, '', line)
+                    #IVA 8%
+                    # Base Imponible
+                    sheet.write(row, 19, '', line)
+                    # % Alic
+                    sheet.write(row, 20, '', line)
+                    #Imp. IVA
+                    sheet.write(row, 21, '', line)
 
                         #IVA 31%
-                        # Base Imponible
-                        sheet.write(row, 22, '', line)
-                        # % Alic
-                        sheet.write(row, 23, '', line)
-                        #Imp. IVA
-                        sheet.write(row, 24, '', line)
-                        
+                    # Base Imponible
+                    sheet.write(row, 22, '', line)
+                    # % Alic
+                    sheet.write(row, 23, '', line)
+                    #Imp. IVA
+                    sheet.write(row, 24, '', line)
+                    
 
-                        #Retenciones
-                        sheet.write(row, 25, reten.amount, line)
-                        ###### IGTF
-                        sheet.write(row, 26, '', line)
-                        retenciones.remove(reten)
-                        row +=1
+                    #Retenciones
+                    sheet.write(row, 25, reten.amount, line)
+                    ###### IGTF
+                    sheet.write(row, 26, '', line)
+                    # retenciones.remove(reten)
+                    row +=1
 
             elif len(retenciones) > 0 and obj.type == 'sale':
                 for reten in sorted(retenciones, key=lambda x: x.date):
