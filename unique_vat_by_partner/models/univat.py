@@ -9,6 +9,8 @@
 
 from odoo import models, fields, api, _
 from odoo.exceptions import ValidationError
+import logging
+_logger = logging.getLogger(__name__)
 
 class UniVat(models.Model):
     _inherit = 'res.partner'
@@ -16,23 +18,28 @@ class UniVat(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         recs = super(UniVat, self).create(vals_list)
+        if (self.env.company.restrict_partner_identification_duplicates == True):
+            for rec in recs:
+                if rec.vat:
+                    same_vat = self.env['res.partner'].search([
+                        ('vat', '=', rec.vat),
+                        ('id', '!=', rec.id),
+                        ('l10n_latam_identification_type_id', '=',
+                            rec.l10n_latam_identification_type_id.id),
+                    ])
 
-        for rec in recs:
-            if rec.vat:
-                same_vat = self.env['res.partner'].search([
-                    ('vat', '=', rec.vat),
-                    ('id', '!=', rec.id),
-                    ('l10n_latam_identification_type_id', '=', rec.l10n_latam_identification_type_id.id),
-                ])
-
-                for partner in same_vat:
-                    child = []
-                    if partner.child_ids:
-                        child = [p.id for p in partner.child_ids]
-                    if partner.parent_id:
-                        child.append(partner.parent_id.id)
-                    if rec.id not in child:
-                        raise ValidationError(
-                            _('Ya se encuentra registrado el Número de Identificación %s para el Contacto (%s)') % (rec.vat, partner.name))
-
+                    if same_vat:
+                        child = []
+                        if rec.child_ids:
+                            child = [p.id for p in rec.child_ids]
+                        if rec.parent_id:
+                            child.append(rec.parent_id.id)
+                        if same_vat.id not in child:
+                            raise ValidationError(
+                                _('Ya se encuentra registrado el Número de Identificación %s para el Contacto (%s)') % (rec.vat, same_vat.name))
         return recs
+
+class ResCompany(models.Model):
+    _inherit = 'res.company'
+
+    restrict_partner_identification_duplicates = fields.Boolean('Restringir creacion de contactos duplicados por (VAT/DNI)')
