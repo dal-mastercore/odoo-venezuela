@@ -11,9 +11,9 @@ from . import l10n_ve_responsibility_type
 from . import res_partner
 from . import res_bank
 from . import res_partner_bank
-from . import res_company
 from . import res_currency_rate
 from . import res_country_state
 from . import res_country_state_municipality
 from . import res_country_state_municipality_parish
 from . import res_country
+#from . import res_company
